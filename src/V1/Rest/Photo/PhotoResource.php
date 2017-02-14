@@ -76,6 +76,11 @@ class PhotoResource extends ApigilityResource
 
     public function deleteList($data)
     {
-        print_r($data);exit();
+        try {
+            $auth_user = $this->userService->getAuthUser();
+            return $this->photoService->deletePhotos($data['ids'], $data['album_id'], $auth_user);
+        } catch (\Exception $exception) {
+            return new ApiProblem($exception->getCode(), $exception->getMessage());
+        }
     }
 }

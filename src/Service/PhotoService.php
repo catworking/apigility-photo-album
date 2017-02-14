@@ -156,4 +156,33 @@ class PhotoService
 
         return true;
     }
+
+    /**
+     * 删除多个照片
+     *
+     * @param $photo_ids
+     * @param $album_id
+     * @param User $user
+     * @return bool
+     * @throws \Exception
+     */
+    public function deletePhotos($photo_ids, $album_id, User $user)
+    {
+        foreach ($photo_ids as $photo_id) {
+            $photo = $this->getPhoto($photo_id);
+
+            if ($photo->getAlbum()->getId() !== $album_id) {
+                throw new \Exception('照片不在指定的相册中，无权删除', 403);
+            }
+
+            if ($photo->getUser()->getId() === $user->getId()) {
+                $this->em->remove($photo);
+                $this->em->flush();
+            } else {
+                throw new \Exception('没有删除此照片的权限', 403);
+            }
+        }
+
+        return true;
+    }
 }
